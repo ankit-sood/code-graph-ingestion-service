@@ -188,7 +188,7 @@ Fix:
 
 - Use batch cleanup in test setup:
 	- `graphBuildJpaRepository.deleteAllInBatch()`
-	- `repositoryJpaRepository.deleteAllInBatch()`
+	- `gitRepositoryJpaRepository.deleteAllInBatch()`
 
 ### Build remains in non-terminal status during tests
 

@@ -12,8 +12,8 @@ import org.blr.domain.GraphBuildStatus;
 import org.blr.domain.RepositoryGraphStatus;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -35,13 +35,13 @@ class RetentionCleanupServiceIntegrationTest {
     private GraphBuildJpaRepository graphBuildJpaRepository;
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @BeforeEach
     void setUp() {
 
         graphBuildJpaRepository.deleteAllInBatch();
-        repositoryJpaRepository.deleteAllInBatch();
+        gitRepositoryJpaRepository.deleteAllInBatch();
     }
 
     @Test
@@ -52,7 +52,7 @@ class RetentionCleanupServiceIntegrationTest {
         repository.setGitUrl("https://example.org/repo-retention.git");
         repository.setDefaultBranch("main");
         repository.setGraphStatus(RepositoryGraphStatus.READY);
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
 
         Path oldArchive = tempDir.resolve("old.tar.gz");
         Path oldManifest = tempDir.resolve("old.manifest.json");
@@ -88,7 +88,7 @@ class RetentionCleanupServiceIntegrationTest {
 
         repository.setActiveCommitSha("commit-latest");
         repository.setActiveGraphUri(latestArchive.toUri().toString());
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
 
         retentionCleanupService.cleanupRepository("repo-retention");
 
@@ -113,7 +113,7 @@ class RetentionCleanupServiceIntegrationTest {
         repository.setDefaultBranch("main");
         repository.setGraphStatus(RepositoryGraphStatus.BUILDING);
         repository.setTargetCommitSha("commit-protected");
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
 
         GraphBuildEntity protectedBuild = new GraphBuildEntity();
         protectedBuild.setBuildId("build-protected");

@@ -20,7 +20,7 @@ import org.blr.error.ErrorCode;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -42,7 +42,7 @@ class GraphBuildApiIntegrationTest {
     private GraphStatusController graphStatusController;
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @Autowired
     private GraphBuildJpaRepository graphBuildJpaRepository;
@@ -53,7 +53,7 @@ class GraphBuildApiIntegrationTest {
     void setUp() throws IOException, InterruptedException {
 
         graphBuildJpaRepository.deleteAllInBatch();
-        repositoryJpaRepository.deleteAllInBatch();
+        gitRepositoryJpaRepository.deleteAllInBatch();
 
         Path localRepo = createLocalRepository(tempDir.resolve("repo-phase2"));
 
@@ -63,7 +63,7 @@ class GraphBuildApiIntegrationTest {
         repository.setGitUrl(localRepo.toAbsolutePath().toString());
         repository.setDefaultBranch("main");
         repository.setGraphStatus(RepositoryGraphStatus.UNKNOWN);
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
     }
 
     @Test

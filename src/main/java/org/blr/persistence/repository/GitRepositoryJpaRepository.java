@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RepositoryJpaRepository extends JpaRepository<RepositoryEntity, String> {
+public interface GitRepositoryJpaRepository extends JpaRepository<RepositoryEntity, String> {
 
     Optional<RepositoryEntity> findByRepositoryName(String repositoryName);
 

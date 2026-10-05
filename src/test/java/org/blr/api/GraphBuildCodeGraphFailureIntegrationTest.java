@@ -17,7 +17,7 @@ import org.blr.error.ErrorCode;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -41,7 +41,7 @@ class GraphBuildCodeGraphFailureIntegrationTest {
     private GraphBuildController graphBuildController;
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @Autowired
     private GraphBuildJpaRepository graphBuildJpaRepository;
@@ -52,7 +52,7 @@ class GraphBuildCodeGraphFailureIntegrationTest {
     void setUp() throws IOException, InterruptedException {
 
         graphBuildJpaRepository.deleteAllInBatch();
-        repositoryJpaRepository.deleteAllInBatch();
+        gitRepositoryJpaRepository.deleteAllInBatch();
 
         Path localRepo = createLocalRepository(tempDir.resolve("repo-phase4"));
 
@@ -62,7 +62,7 @@ class GraphBuildCodeGraphFailureIntegrationTest {
         repository.setGitUrl(localRepo.toAbsolutePath().toString());
         repository.setDefaultBranch("main");
         repository.setGraphStatus(RepositoryGraphStatus.UNKNOWN);
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
     }
 
     @Test
@@ -78,7 +78,7 @@ class GraphBuildCodeGraphFailureIntegrationTest {
         assertThat(build.getStatus()).isEqualTo(GraphBuildStatus.FAILED);
         assertThat(build.getErrorCode()).isEqualTo(ErrorCode.CODEGRAPH_EXECUTION_FAILED);
 
-        RepositoryEntity repository = repositoryJpaRepository.findById("repo-phase4").orElseThrow();
+        RepositoryEntity repository = gitRepositoryJpaRepository.findById("repo-phase4").orElseThrow();
         assertThat(repository.getGraphStatus()).isEqualTo(RepositoryGraphStatus.DEGRADED);
     }
 

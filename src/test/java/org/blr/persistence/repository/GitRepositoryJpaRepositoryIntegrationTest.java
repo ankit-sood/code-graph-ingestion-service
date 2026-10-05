@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class RepositoryJpaRepositoryIntegrationTest {
+class GitRepositoryJpaRepositoryIntegrationTest {
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @Test
     void shouldPersistRepositoryAndSupportPessimisticLookup() {
@@ -27,9 +27,9 @@ class RepositoryJpaRepositoryIntegrationTest {
         repository.setDefaultBranch("main");
         repository.setGraphStatus(RepositoryGraphStatus.READY);
 
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
 
-        RepositoryEntity locked = repositoryJpaRepository.findByRepositoryIdForUpdate("repo-1")
+        RepositoryEntity locked = gitRepositoryJpaRepository.findByRepositoryIdForUpdate("repo-1")
             .orElseThrow();
 
         assertThat(locked.getRepositoryId()).isEqualTo("repo-1");
@@ -52,9 +52,9 @@ class RepositoryJpaRepositoryIntegrationTest {
         second.setGitUrl("https://example.org/repo-three.git");
         second.setGraphStatus(RepositoryGraphStatus.UNKNOWN);
 
-        repositoryJpaRepository.saveAndFlush(first);
+        gitRepositoryJpaRepository.saveAndFlush(first);
 
-        assertThatThrownBy(() -> repositoryJpaRepository.saveAndFlush(second))
+        assertThatThrownBy(() -> gitRepositoryJpaRepository.saveAndFlush(second))
             .isInstanceOf(DataIntegrityViolationException.class);
     }
 }

@@ -10,7 +10,7 @@ import org.blr.error.ErrorCode;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -21,16 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class GraphBuildApplicationService {
 
-    private final RepositoryJpaRepository repositoryJpaRepository;
+    private final GitRepositoryJpaRepository gitRepositoryJpaRepository;
     private final GraphBuildJpaRepository graphBuildJpaRepository;
     private final GraphBuildExecutionService graphBuildExecutionService;
 
     public GraphBuildApplicationService(
-        RepositoryJpaRepository repositoryJpaRepository,
+        GitRepositoryJpaRepository gitRepositoryJpaRepository,
         GraphBuildJpaRepository graphBuildJpaRepository,
         GraphBuildExecutionService graphBuildExecutionService
     ) {
-        this.repositoryJpaRepository = repositoryJpaRepository;
+        this.gitRepositoryJpaRepository = gitRepositoryJpaRepository;
         this.graphBuildJpaRepository = graphBuildJpaRepository;
         this.graphBuildExecutionService = graphBuildExecutionService;
     }
@@ -38,7 +38,7 @@ public class GraphBuildApplicationService {
     @Transactional
     public GraphBuildAcceptedResponse createBuild(String repositoryId, String commitSha) {
 
-        RepositoryEntity repository = repositoryJpaRepository.findByRepositoryIdForUpdate(repositoryId)
+        RepositoryEntity repository = gitRepositoryJpaRepository.findByRepositoryIdForUpdate(repositoryId)
             .orElseThrow(() -> new AppException(
                 ErrorCode.REPOSITORY_NOT_FOUND,
                 "Repository not found: " + repositoryId

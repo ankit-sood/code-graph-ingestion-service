@@ -20,7 +20,7 @@ import org.blr.git.GitRepositoryClient;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.blr.storage.GraphArtifactUploadRequest;
 import org.blr.storage.GraphArtifactUploadResult;
 import org.blr.storage.GraphArtifactUploadService;
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GraphBuildExecutionService {
 
     private final GraphBuildJpaRepository graphBuildJpaRepository;
-    private final RepositoryJpaRepository repositoryJpaRepository;
+    private final GitRepositoryJpaRepository gitRepositoryJpaRepository;
     private final WorkspaceManager workspaceManager;
     private final GitRepositoryClient gitRepositoryClient;
     private final CodeGraphRunner codeGraphRunner;
@@ -48,7 +48,7 @@ public class GraphBuildExecutionService {
 
     public GraphBuildExecutionService(
         GraphBuildJpaRepository graphBuildJpaRepository,
-        RepositoryJpaRepository repositoryJpaRepository,
+        GitRepositoryJpaRepository gitRepositoryJpaRepository,
         WorkspaceManager workspaceManager,
         GitRepositoryClient gitRepositoryClient,
         CodeGraphRunner codeGraphRunner,
@@ -58,7 +58,7 @@ public class GraphBuildExecutionService {
         GraphBuildPublicationService graphBuildPublicationService
     ) {
         this.graphBuildJpaRepository = graphBuildJpaRepository;
-        this.repositoryJpaRepository = repositoryJpaRepository;
+        this.gitRepositoryJpaRepository = gitRepositoryJpaRepository;
         this.workspaceManager = workspaceManager;
         this.gitRepositoryClient = gitRepositoryClient;
         this.codeGraphRunner = codeGraphRunner;
@@ -196,11 +196,11 @@ public class GraphBuildExecutionService {
         int maxAttempts = 3;
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                RepositoryEntity repository = repositoryJpaRepository.findById(repositoryId)
+                RepositoryEntity repository = gitRepositoryJpaRepository.findById(repositoryId)
                     .orElseThrow(() -> new IllegalStateException("Repository not found: " + repositoryId));
                 repository.setTargetCommitSha(targetCommitSha);
                 repository.setGraphStatus(status);
-                repositoryJpaRepository.saveAndFlush(repository);
+                gitRepositoryJpaRepository.saveAndFlush(repository);
                 return;
             } catch (ObjectOptimisticLockingFailureException ex) {
                 if (attempt == maxAttempts) {
@@ -245,10 +245,10 @@ public class GraphBuildExecutionService {
         int maxAttempts = 3;
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                repository = repositoryJpaRepository.findById(repositoryId).orElse(repository);
+                repository = gitRepositoryJpaRepository.findById(repositoryId).orElse(repository);
                 repository.setTargetCommitSha(null);
                 repository.setGraphStatus(RepositoryGraphStatus.DEGRADED);
-                repositoryJpaRepository.saveAndFlush(repository);
+                gitRepositoryJpaRepository.saveAndFlush(repository);
                 break;
             } catch (ObjectOptimisticLockingFailureException optimisticLockEx) {
                 if (attempt == maxAttempts) {

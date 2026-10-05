@@ -16,7 +16,7 @@ import org.blr.domain.RepositoryGraphStatus;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -42,7 +42,7 @@ class GraphBuildPublicationPolicyIntegrationTest {
     private GraphBuildController graphBuildController;
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @Autowired
     private GraphBuildJpaRepository graphBuildJpaRepository;
@@ -54,7 +54,7 @@ class GraphBuildPublicationPolicyIntegrationTest {
     void setUp() throws Exception {
 
         graphBuildJpaRepository.deleteAllInBatch();
-        repositoryJpaRepository.deleteAllInBatch();
+        gitRepositoryJpaRepository.deleteAllInBatch();
 
         Path localRepo = createRepositoryWithSlowAndFastCommits(tempDir.resolve("repo-phase7"));
 
@@ -64,7 +64,7 @@ class GraphBuildPublicationPolicyIntegrationTest {
         repository.setGitUrl(localRepo.toAbsolutePath().toString());
         repository.setDefaultBranch("main");
         repository.setGraphStatus(RepositoryGraphStatus.UNKNOWN);
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
     }
 
     @Test
@@ -88,7 +88,7 @@ class GraphBuildPublicationPolicyIntegrationTest {
         assertThat(olderBuild.getStatus()).isEqualTo(GraphBuildStatus.PUBLISHED);
         assertThat(newerBuild.getStatus()).isEqualTo(GraphBuildStatus.PUBLISHED);
 
-        RepositoryEntity repository = repositoryJpaRepository.findById("repo-phase7").orElseThrow();
+        RepositoryEntity repository = gitRepositoryJpaRepository.findById("repo-phase7").orElseThrow();
         assertThat(repository.getGraphStatus()).isEqualTo(RepositoryGraphStatus.READY);
         assertThat(repository.getActiveCommitSha()).isEqualTo(newerCommitSha);
         assertThat(repository.getActiveGraphUri()).contains(newerCommitSha);

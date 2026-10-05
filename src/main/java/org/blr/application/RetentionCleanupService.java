@@ -13,8 +13,8 @@ import org.blr.config.GraphIngestionProperties;
 import org.blr.domain.GraphBuildStatus;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -34,16 +34,16 @@ public class RetentionCleanupService {
 
     private final GraphIngestionProperties properties;
     private final GraphBuildJpaRepository graphBuildJpaRepository;
-    private final RepositoryJpaRepository repositoryJpaRepository;
+    private final GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     public RetentionCleanupService(
         GraphIngestionProperties properties,
         GraphBuildJpaRepository graphBuildJpaRepository,
-        RepositoryJpaRepository repositoryJpaRepository
+        GitRepositoryJpaRepository gitRepositoryJpaRepository
     ) {
         this.properties = properties;
         this.graphBuildJpaRepository = graphBuildJpaRepository;
-        this.repositoryJpaRepository = repositoryJpaRepository;
+        this.gitRepositoryJpaRepository = gitRepositoryJpaRepository;
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class RetentionCleanupService {
     public void cleanupRepository(String repositoryId) {
         int versionsToKeep = Math.max(1, properties.retention().versions());
 
-        RepositoryEntity repository = repositoryJpaRepository.findByRepositoryIdForUpdate(repositoryId).orElse(null);
+        RepositoryEntity repository = gitRepositoryJpaRepository.findByRepositoryIdForUpdate(repositoryId).orElse(null);
         if (repository == null) {
             log.info("retention_cleanup_skipped repositoryId={} reason=repository_missing", repositoryId);
             return;

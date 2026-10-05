@@ -7,7 +7,7 @@ import org.blr.domain.RepositoryGraphStatus;
 import org.blr.error.AppException;
 import org.blr.error.ErrorCode;
 import org.blr.persistence.entity.RepositoryEntity;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 class JpaRepositoryRegistrationReadModelIntegrationTest {
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @Autowired
     private RepositoryRegistrationReadModel readModel;
@@ -30,7 +30,7 @@ class JpaRepositoryRegistrationReadModelIntegrationTest {
         repository.setRepositoryName("repo-read-one");
         repository.setGitUrl("https://example.org/repo-read-one.git");
         repository.setGraphStatus(RepositoryGraphStatus.READY);
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
 
         RegisteredRepository loaded = readModel.getById("repo-read-1");
 

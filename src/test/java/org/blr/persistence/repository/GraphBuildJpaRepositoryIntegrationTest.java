@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 class GraphBuildJpaRepositoryIntegrationTest {
 
     @Autowired
-    private RepositoryJpaRepository repositoryJpaRepository;
+    private GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     @Autowired
     private GraphBuildJpaRepository graphBuildJpaRepository;
@@ -38,7 +38,7 @@ class GraphBuildJpaRepositoryIntegrationTest {
         repository.setRepositoryName("repo-build-one");
         repository.setGitUrl("https://example.org/repo-build-one.git");
         repository.setGraphStatus(RepositoryGraphStatus.BUILDING);
-        repositoryJpaRepository.saveAndFlush(repository);
+        gitRepositoryJpaRepository.saveAndFlush(repository);
 
         GraphBuildEntity build = new GraphBuildEntity();
         build.setBuildId("build-1");

@@ -9,8 +9,8 @@ import org.blr.error.AppException;
 import org.blr.error.ErrorCode;
 import org.blr.persistence.entity.GraphBuildEntity;
 import org.blr.persistence.entity.RepositoryEntity;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.blr.persistence.repository.GraphBuildJpaRepository;
-import org.blr.persistence.repository.RepositoryJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +28,14 @@ public class GraphBuildPublicationService {
     );
 
     private final GraphBuildJpaRepository graphBuildJpaRepository;
-    private final RepositoryJpaRepository repositoryJpaRepository;
+    private final GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
     public GraphBuildPublicationService(
         GraphBuildJpaRepository graphBuildJpaRepository,
-        RepositoryJpaRepository repositoryJpaRepository
+        GitRepositoryJpaRepository gitRepositoryJpaRepository
     ) {
         this.graphBuildJpaRepository = graphBuildJpaRepository;
-        this.repositoryJpaRepository = repositoryJpaRepository;
+        this.gitRepositoryJpaRepository = gitRepositoryJpaRepository;
     }
 
     @Transactional
@@ -43,7 +43,7 @@ public class GraphBuildPublicationService {
         GraphBuildEntity build = graphBuildJpaRepository.findById(buildId)
             .orElseThrow(() -> new IllegalStateException("Build not found: " + buildId));
 
-        RepositoryEntity lockedRepository = repositoryJpaRepository.findByRepositoryIdForUpdate(
+        RepositoryEntity lockedRepository = gitRepositoryJpaRepository.findByRepositoryIdForUpdate(
             build.getRepository().getRepositoryId()
         ).orElseThrow(() -> new IllegalStateException("Repository not found while publishing build: " + buildId));
 
@@ -97,7 +97,7 @@ public class GraphBuildPublicationService {
             lockedRepository.setTargetCommitSha(null);
         }
 
-        repositoryJpaRepository.saveAndFlush(lockedRepository);
+        gitRepositoryJpaRepository.saveAndFlush(lockedRepository);
         return build;
     }
 }

@@ -3,21 +3,21 @@ package org.blr.repository;
 import org.blr.error.AppException;
 import org.blr.error.ErrorCode;
 import org.blr.persistence.entity.RepositoryEntity;
-import org.blr.persistence.repository.RepositoryJpaRepository;
+import org.blr.persistence.repository.GitRepositoryJpaRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JpaRepositoryRegistrationReadModel implements RepositoryRegistrationReadModel {
 
-    private final RepositoryJpaRepository repositoryJpaRepository;
+    private final GitRepositoryJpaRepository gitRepositoryJpaRepository;
 
-    public JpaRepositoryRegistrationReadModel(RepositoryJpaRepository repositoryJpaRepository) {
-        this.repositoryJpaRepository = repositoryJpaRepository;
+    public JpaRepositoryRegistrationReadModel(GitRepositoryJpaRepository gitRepositoryJpaRepository) {
+        this.gitRepositoryJpaRepository = gitRepositoryJpaRepository;
     }
 
     @Override
     public RegisteredRepository getById(String repositoryId) {
-        RepositoryEntity entity = repositoryJpaRepository.findById(repositoryId)
+        RepositoryEntity entity = gitRepositoryJpaRepository.findById(repositoryId)
             .orElseThrow(() -> new AppException(
                 ErrorCode.REPOSITORY_NOT_FOUND,
                 "Repository not found: " + repositoryId
@@ -34,6 +34,6 @@ public class JpaRepositoryRegistrationReadModel implements RepositoryRegistratio
 
     @Override
     public boolean exists(String repositoryId) {
-        return repositoryJpaRepository.existsById(repositoryId);
+        return gitRepositoryJpaRepository.existsById(repositoryId);
     }
 }
