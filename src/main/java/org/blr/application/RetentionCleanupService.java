@@ -46,6 +46,7 @@ public class RetentionCleanupService {
         this.repositoryJpaRepository = repositoryJpaRepository;
     }
 
+    @Transactional
     @Async("graphBuildExecutor")
     public void cleanupRepositoryAsync(String repositoryId) {
         try {

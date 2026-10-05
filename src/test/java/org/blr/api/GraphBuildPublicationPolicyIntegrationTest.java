@@ -52,8 +52,9 @@ class GraphBuildPublicationPolicyIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        graphBuildJpaRepository.deleteAll();
-        repositoryJpaRepository.deleteAll();
+
+        graphBuildJpaRepository.deleteAllInBatch();
+        repositoryJpaRepository.deleteAllInBatch();
 
         Path localRepo = createRepositoryWithSlowAndFastCommits(tempDir.resolve("repo-phase7"));
 

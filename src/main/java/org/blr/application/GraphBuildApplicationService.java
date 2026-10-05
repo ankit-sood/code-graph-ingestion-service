@@ -13,6 +13,8 @@ import org.blr.persistence.repository.GraphBuildJpaRepository;
 import org.blr.persistence.repository.RepositoryJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -35,13 +37,16 @@ public class GraphBuildApplicationService {
 
     @Transactional
     public GraphBuildAcceptedResponse createBuild(String repositoryId, String commitSha) {
+
         RepositoryEntity repository = repositoryJpaRepository.findByRepositoryIdForUpdate(repositoryId)
             .orElseThrow(() -> new AppException(
                 ErrorCode.REPOSITORY_NOT_FOUND,
                 "Repository not found: " + repositoryId
             ));
 
-        String resolvedCommitSha = (commitSha == null || commitSha.isBlank()) ? "LATEST_MAIN" : commitSha;
+        String resolvedCommitSha = (commitSha == null || commitSha.isBlank())
+            ? "LATEST_MAIN"
+            : commitSha;
 
         var existingBuild = graphBuildJpaRepository
             .findFirstByRepository_RepositoryIdAndCommitShaOrderByCreatedAtDesc(repositoryId, resolvedCommitSha)
@@ -81,7 +86,17 @@ public class GraphBuildApplicationService {
             GraphBuildStatus.QUEUED
         );
 
-        graphBuildExecutionService.executeBuildAsync(buildId);
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            // Schedule asynchronous execution after commit so the worker sees persisted rows.
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    graphBuildExecutionService.executeBuildAsync(buildId);
+                }
+            });
+        } else {
+            graphBuildExecutionService.executeBuildAsync(buildId);
+        }
 
         return new GraphBuildAcceptedResponse(
             buildId,

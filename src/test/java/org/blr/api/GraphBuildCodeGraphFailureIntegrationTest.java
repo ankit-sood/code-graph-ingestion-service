@@ -50,8 +50,9 @@ class GraphBuildCodeGraphFailureIntegrationTest {
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        graphBuildJpaRepository.deleteAll();
-        repositoryJpaRepository.deleteAll();
+
+        graphBuildJpaRepository.deleteAllInBatch();
+        repositoryJpaRepository.deleteAllInBatch();
 
         Path localRepo = createLocalRepository(tempDir.resolve("repo-phase4"));
 

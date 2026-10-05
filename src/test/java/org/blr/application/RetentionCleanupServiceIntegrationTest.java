@@ -39,8 +39,9 @@ class RetentionCleanupServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        graphBuildJpaRepository.deleteAll();
-        repositoryJpaRepository.deleteAll();
+
+        graphBuildJpaRepository.deleteAllInBatch();
+        repositoryJpaRepository.deleteAllInBatch();
     }
 
     @Test
